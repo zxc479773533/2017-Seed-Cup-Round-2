@@ -1,16 +1,21 @@
+# ------------------------------------------------------------------------
+# Project: 2017 Seed cup round 2
+# Author: Jiyang Qi, Zhihao Wang, Yue Pan
+# GitHub: https://github.com/zxc479773533/2017-Seed-Cup-Round-2.git
+# Module: Simple tool to get behavior information
+# ------------------------------------------------------------------------
+
+import sys
 import numpy as np
 import pandas as pd
 
-# in
-# all data
-# out
-# {user1:{product1:browse_count}}
-
 
 def get_browse(filename, action):
+    """
+    """
     data = pd.read_csv(filename)
     values = data.values
-    print(values.shape)
+    print("Data shape: {}".format(values.shape))
     ret = {}
     for i in range(len(values)):
         if values[i][3] == action:
@@ -35,7 +40,12 @@ def get_information(browse_data, number):
 
 
 if __name__ == '__main__':
-    filename = 'behavior_info.csv'
-    finall = get_browse(filename, 3)
-    print(len(finall))
-    get_information(finall, 1)
+    try:
+        action = int(sys.argv[1])
+        print("user behavior code: {}".format(action))
+        behavior_info = '../behavior_info.csv'
+        finall = get_browse(behavior_info, action)
+        print(len(finall))
+        get_information(finall, 1)
+    except:
+        print("Usage: python get_behavior_info [user behavior code]")
