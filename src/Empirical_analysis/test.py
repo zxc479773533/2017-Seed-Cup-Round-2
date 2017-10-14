@@ -18,7 +18,7 @@ def get_numlist(datafile, numlistfile, usernum):
                 rline = rfp.readline()
                 if not rline:  # if it's the end
                     break
-                numlist[int(rline.split(',')[1])-1] += 1
+                numlist[int(rline.split(',')[1]) - 1] += 1
             np.save(numlistfile, numlist)
         return numlist
 
@@ -61,18 +61,21 @@ def calc_time_range(user, boughtlist, behaviors, userclass, time_range, predict_
     for product in behaviors:
         # print(product, len(behaviors[product]))
         if len(behaviors[product]) > 2:
-            time_range[user].append([predict_time+1, predict_time+2, product])
+            time_range[user].append(
+                [predict_time + 1, predict_time + 2, product])
             continue
         if behaviors[product][0][2] == 0:
             if behaviors[product][0][0] > time_bound or \
                     behaviors[product][0][1] > time_bound:
                 if len(boughtlist) / len(behaviors) > rate_bound:
-                    time_range[user].append([predict_time+1, predict_time+2, product])
+                    time_range[user].append(
+                        [predict_time + 1, predict_time + 2, product])
                     continue
             elif userclass[user] > 4 and behaviors[product][0][0] > superbound or \
                     behaviors[product][0][1] > superbound:
                 if len(boughtlist) / len(behaviors) > rate_bound:
-                    time_range[user].append([predict_time+1, predict_time+2, product])
+                    time_range[user].append(
+                        [predict_time + 1, predict_time + 2, product])
                     continue
             product_range = [float("inf"), 0, product]
             if behaviors[product][0][0] and gap_star:
@@ -111,12 +114,13 @@ def get_time(datafile, numlistfile, usernum, predict_time):
                         behaviors[product] = [[0, 0, 0]]
                     elif behaviors[product][-1][2]:
                         behaviors[product].append([0, 0, 0])
-                    behaviors[product][-1][behavior_type-2] = int(line[3])
+                    behaviors[product][-1][behavior_type - 2] = int(line[3])
                     if behavior_type == 4:
                         boughtlist.add(product)
 
             userclass = get_userclass('user_info.csv', 'user_class.npy')
-            calc_time_range(user, boughtlist, behaviors, userclass, time_range, predict_time, predict_time-86400, predict_time-2*86400)
+            calc_time_range(user, boughtlist, behaviors, userclass, time_range,
+                            predict_time, predict_time - 86400, predict_time - 2 * 86400)
             # if user+1 > 3:
             #     break
 
@@ -127,9 +131,9 @@ def filter(usernum, time_range, predict_time):
     result = []
     for user in range(usernum):
         for time in time_range[user]:
-            if time[0] >= predict_time and time[0] <= predict_time+3*86400 or \
-                    time[1] >= predict_time and time[1] <= predict_time+3*86400:
-                result.append([user+1, time[2]])
+            if time[0] >= predict_time and time[0] <= predict_time + 3 * 86400 or \
+                    time[1] >= predict_time and time[1] <= predict_time + 3 * 86400:
+                result.append([user + 1, time[2]])
     print(len(result))
     result = pd.DataFrame(np.array(result))
     result.to_csv('test.csv')

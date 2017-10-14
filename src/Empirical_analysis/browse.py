@@ -48,4 +48,4 @@ if __name__ == '__main__':
         print(len(finall))
         get_information(finall, 1)
     except:
-        print("Usage: python get_behavior_info [user behavior code]")
+        print("Usage: python get_behavior_info [action code]")
