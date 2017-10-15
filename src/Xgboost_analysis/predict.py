@@ -44,7 +44,7 @@ def get_numlist(datafile, numlistfile, usernum):
                 rline = rfp.readline()
                 if not rline:  # if it's the end
                     break
-                numlist[int(rline.split(',')[1]) - 1] += 1
+                numlist[int(rline.split(',')[1])-1] += 1
             pickle.dump(numlist, open(numlistfile, 'wb'))
         return numlist
 
@@ -95,37 +95,34 @@ def dict_count(dictionary, key, time):
 def get_features(pos_dataset, neg_dataset, buy_label, user, boughtlist,
                  behaviors, browse_count, cart_count, star_count,
                  user_info, product_info, endtime):
-    gap_jiagou = []  # time gap from jiagou to buying
+    gap_cart = []  # time gap from carting to buying
     gap_star = []  # time gap from starring to buying
     for product in boughtlist:
-        max_from_jiagou = 0  # get the max time gap for every product
+        max_from_cart = 0  # get the max time gap for every product
         max_from_star = 0
         for every_buy in behaviors[product]:
             if every_buy[2]:
                 if every_buy[1]:
-                    max_from_jiagou = max(max_from_jiagou,
+                    max_from_cart = max(max_from_cart,
                                           every_buy[2] - every_buy[1])
                 if every_buy[0]:
                     max_from_star = max(max_from_star,
                                         every_buy[2] - every_buy[0])
-        if max_from_jiagou:
-            gap_jiagou.append(max_from_jiagou)
+        if max_from_cart:
+            gap_cart.append(max_from_cart)
         if max_from_star:
             gap_star.append(max_from_star)
 
     for product in behaviors:
         features = [len(behaviors[product]), len(boughtlist) / len(behaviors)]
-        features += browse_count[product][:-
-                                          1] if product in browse_count else [0, 0]
-        features += cart_count[product][:-
-                                        1] if product in cart_count else [0, 0]
-        features += star_count[product][:-
-                                        1] if product in star_count else [0, 0]
+        features += browse_count[product][:-1] if product in browse_count else [0, 0]
+        features += cart_count[product][:-1] if product in cart_count else [0, 0]
+        features += star_count[product][:-1] if product in star_count else [0, 0]
         features.append(1 if behaviors[product][-1][2] else 0)
         features.append(len(behaviors))
         features.append((endtime - max(behaviors[product][-1])) // 86400)
         features += list(user_info[user])
-        features += list(product_info[product - 1])
+        features += list(product_info[product-1])
         if product in buy_label:
             pos_dataset['features'].append(features)
             pos_dataset['user_product'].append((user + 1, product))
@@ -133,7 +130,7 @@ def get_features(pos_dataset, neg_dataset, buy_label, user, boughtlist,
             neg_dataset['features'].append(features)
             neg_dataset['user_product'].append((user + 1, product))
 
-    # print(user+1, gap_jiagou, time_range[user])
+    # print(user+1, gap_cart, time_range[user])
     # print()
 
 
@@ -171,7 +168,7 @@ def get_data(datafile, numlist_file, usernum, starttime, endtime):
                     if time < starttime:
                         continue
                     elif time > endtime:
-                        if behavior_type == 4 and time < endtime + 3 * 86400:
+                        if behavior_type == 4 and time < endtime + 3*86400:
                             buy_label.append(product)
                         continue
                     if behavior_type > 1:
@@ -179,7 +176,7 @@ def get_data(datafile, numlist_file, usernum, starttime, endtime):
                             behaviors[product] = [[0, 0, 0]]
                         elif behaviors[product][-1][2]:
                             behaviors[product].append([0, 0, 0])
-                        behaviors[product][-1][behavior_type - 2] = time
+                        behaviors[product][-1][behavior_type-2] = time
                         if behavior_type == 4:
                             boughtlist.add(product)
                         elif behavior_type == 3:
@@ -268,7 +265,7 @@ def predict(bsts, starttime, endtime, model_num):
     for i in range(len(neg_dataset['features'])):
         vote = 0
         for label in predict_label:
-            if label[i] > 0.13:
+            if label[i] > 0.08:
                 vote += 1
         if vote > model_num // 2:
             result.append(neg_dataset['user_product'][i])
@@ -283,12 +280,5 @@ if __name__ == '__main__':
     # bsts = get_model("2017-7-26 00:00:00",
     #                  "2017-8-23 00:00:00", 5000, model_num)
     bsts = get_submit_model("2017-7-26 00:00:00",
-                            "2017-8-23 00:00:00", 5000, model_num)
+                     "2017-8-23 00:00:00", 5000, model_num)
     predict(bsts, "2017-7-29 00:00:00", "2017-8-26 00:00:00", model_num)
-    final_result = pickle.load(open('result.pkl', 'rb'))
-    final_result += pickle.load(open('../competition/result.pkl', 'rb'))
-    print('removing same pairs')
-    final_result = list(set([tuple(user_prod) for user_prod in final_result]))
-    print('final length: ', len(final_result))
-    final_result = pd.DataFrame(np.array(final_result))
-    final_result.to_csv('final_result.csv')
