@@ -367,7 +367,7 @@ if __name__ == '__main__':
 
     # save the final result
     print('final length: ', len(final_result))
-    with open('../../final_result.txt', 'w') as wfp:
+    with open('../../answer.txt', 'w') as wfp:
         for user_product in final_result:
             wfp.write(str(user_product[0]) + '\t' +
                       str(user_product[1]) + '\n')
