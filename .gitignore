@@ -1,6 +1,5 @@
 # My configrations
 
 .vscode
-*.txt
 *.csv
-*.pdf
+*.txt
