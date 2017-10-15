@@ -111,8 +111,8 @@ def calc_time_frame(user, boughtlist, behaviors, userlevel,
             elif userlevel[user] > 3 and behaviors[product][0][0] > time_bound or \
                     behaviors[product][0][1] > time_bound:
                 # and if user have purchase history or
-                # number of behaviors is less than 6
-                if len(boughtlist) or len(behaviors) < 6:
+                # number of behaviors is less than 7
+                if len(boughtlist) or len(behaviors) < 7:
                     time_frame[user].append([1503676801, 1503676802, product])
                     continue
 
